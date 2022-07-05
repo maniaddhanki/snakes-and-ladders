@@ -7,13 +7,13 @@ class Game {
   constructor(board) {
     this.#board = board;
     this.#dice = new Dice();
-    this.#currentPosition = 1;
+    this.#currentPosition = 0;
     this.#positionLog = [];
     this.#isWon = false;
   }
 
-  #updateLog({ face }, prevPosition) {
-    this.#positionLog.push({ diceFace: face, postion: this.#currentPosition, prevPosition });
+  #updateLog({ face }, path) {
+    this.#positionLog.push({ diceFace: face, move: path });
   }
 
   #updatePosition(position) {
@@ -31,16 +31,16 @@ class Game {
   }
 
   rollDice() {
-    const prevPosition = this.#currentPosition;
     const roll = this.#dice.roll();
-    const position = this.#board.next(this.#currentPosition, roll.face);
+    const path = this.#board.nextMove(this.#currentPosition, roll.face);
+    const position = path[path.length - 1];
 
     if (this.#isValidPosition(position)) {
       this.#updatePosition(position);
     }
 
     this.#setGameStatus();
-    this.#updateLog(roll, prevPosition);
-    return { prevPosition, img: roll.img, position: this.#currentPosition, iswon: this.#isWon };
+    this.#updateLog(roll, path);
+    return { img: roll.img, path, isWon: this.#isWon };
   }
 }

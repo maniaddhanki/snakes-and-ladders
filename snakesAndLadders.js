@@ -16,23 +16,72 @@ const ladders = () => {
   }
 };
 
-const gameRound = (game) => {
-  const { prevPosition, img, position, iswon } = game.rollDice();
-  document.getElementById('dice').src = img;
-  document.getElementById(prevPosition).innerText = '';
-  document.getElementById(position).innerText = '⚫️';
+const editHtmlParamById = (id, param, value) => {
+  const element = document.getElementById(id);
+  if (!element) {
+    return;
+  }
+  element[param] = value;
+};
 
-  if (iswon) {
+const handleWinnerMsg = isWon => {
+  if (isWon) {
     document.getElementById('winning-msg').style.visibility = 'visible';
   }
-  console.log(game);
+};
+
+const pathCycler = (intervelId) => {
+  let index = 0;
+  return (path) => {
+    const currentPosition = path[index];
+    const next = path[++index];
+
+    if (!next) { return false };
+
+    editHtmlParamById(currentPosition, 'innerText', '');
+    editHtmlParamById(next, 'innerText', '⚫️');
+    return true;
+  }
+};
+
+const handleDice = (game, action) => {
+  const gameLaunch = () => gameRound(game);
+  const dice = document.getElementById('dice');
+  const diceMsg = document.getElementById('dice-msg');
+
+  if (action === 'activate') {
+    dice.onclick = gameLaunch;
+    diceMsg.style.visibility = 'visible';
+    return;
+  }
+  if (action === 'deactivate') {
+    diceMsg.style.visibility = 'hidden';
+    dice.onclick = null;
+    return;
+  }
+};
+
+const gameRound = (game) => {
+  const { path, img, isWon } = game.rollDice();
+  handleDice(game, 'deactivate');
+  editHtmlParamById('dice', 'src', img);
+
+  const moveToken = pathCycler();
+
+  const intervelId = setInterval(() => {
+    if (!moveToken(path)) {
+      clearInterval(intervelId);
+      handleDice(game, 'activate');
+    }
+  }, 500);
+
+  handleWinnerMsg(isWon);
 };
 
 const initGame = () => {
   const board = new Board(snakes(), ladders());
   const game = new Game(board);
-  const dice = document.getElementById('dice');
-  dice.onclick = () => gameRound(game);
+  handleDice(game, 'activate');
 };
 
 window.onload = initGame;
