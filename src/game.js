@@ -3,6 +3,7 @@ class Game {
   #dice;
   #currentPosition;
   #positionLog;
+  #isPaused;
   #isWon;
   constructor(board) {
     this.#board = board;
@@ -10,6 +11,7 @@ class Game {
     this.#currentPosition = 0;
     this.#positionLog = [];
     this.#isWon = false;
+    this.#isPaused = false;
   }
 
   #updateLog({ face }, path) {
@@ -26,7 +28,19 @@ class Game {
     }
   }
 
-  rollDice() {
+  resume() {
+    this.#isPaused = false;
+  }
+
+  pause() {
+    this.#isPaused = true;
+  }
+
+  get isPaused() {
+    return this.#isPaused;
+  }
+
+  play() {
     const roll = this.#dice.roll();
     const path = this.#board.nextMove(this.#currentPosition, roll.face);
     if (path.length > 0) {
@@ -35,6 +49,6 @@ class Game {
 
     this.#setGameStatus();
     this.#updateLog(roll, path);
-    return { img: roll.img, path, isWon: this.#isWon };
+    return { img: roll.img, path, isWon: this.#isWon, isPaused: this.#isPaused };
   }
 }

@@ -27,7 +27,6 @@ const editHtmlParamById = (id, param, value) => {
 const handleWinnerMsg = isWon => {
   if (isWon) {
     document.getElementById('winning-msg').style.visibility = 'visible';
-    handleDice('', 'deactivate');
   }
 };
 
@@ -45,26 +44,24 @@ const pathCycler = (intervelId) => {
   }
 };
 
-const handleDice = (game, action) => {
-  const gameLaunch = () => gameRound(game);
-  const dice = document.getElementById('dice');
+const handleDiceMsg = (needToOn) => {
   const diceMsg = document.getElementById('dice-msg');
-
-  if (action === 'activate') {
-    dice.onclick = gameLaunch;
-    diceMsg.style.visibility = 'visible';
-    return;
+  let visibility = 'hidden';
+  if (needToOn) {
+    visibility = 'visible';
   }
-  if (action === 'deactivate') {
-    dice.onclick = null;
-    diceMsg.style.visibility = 'hidden';
-    return;
-  }
+  diceMsg.style.visibility = visibility;
 };
 
 const gameRound = (game) => {
-  const { path, img, isWon } = game.rollDice();
-  handleDice(game, 'deactivate');
+  if (game.isPaused) {
+    handleDiceMsg(false);
+    return;
+  };
+
+  const { path, img, isWon } = game.play();
+  game.pause();
+
   editHtmlParamById('dice', 'src', img);
 
   const moveToken = pathCycler();
@@ -72,7 +69,8 @@ const gameRound = (game) => {
   const intervelId = setInterval(() => {
     if (!moveToken(path)) {
       clearInterval(intervelId);
-      handleDice(game, 'activate');
+      game.resume();
+      handleDiceMsg(true);
     }
   }, 500);
 
@@ -82,7 +80,8 @@ const gameRound = (game) => {
 const initGame = () => {
   const board = new Board(snakes(), ladders(), 30);
   const game = new Game(board);
-  handleDice(game, 'activate');
+  const dice = document.getElementById('dice');
+  dice.onclick = () => gameRound(game);
 };
 
 window.onload = initGame;
