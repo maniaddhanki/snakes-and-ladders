@@ -20,10 +20,6 @@ class Game {
     this.#currentPosition = position;
   }
 
-  #isValidPosition(position) {
-    return position <= 30;
-  }
-
   #setGameStatus() {
     if (this.#currentPosition === 30) {
       this.#isWon = true;
@@ -33,10 +29,8 @@ class Game {
   rollDice() {
     const roll = this.#dice.roll();
     const path = this.#board.nextMove(this.#currentPosition, roll.face);
-    const position = path[path.length - 1];
-
-    if (this.#isValidPosition(position)) {
-      this.#updatePosition(position);
+    if (path.length > 0) {
+      this.#updatePosition(path[path.length - 1]);
     }
 
     this.#setGameStatus();

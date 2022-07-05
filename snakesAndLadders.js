@@ -27,6 +27,7 @@ const editHtmlParamById = (id, param, value) => {
 const handleWinnerMsg = isWon => {
   if (isWon) {
     document.getElementById('winning-msg').style.visibility = 'visible';
+    handleDice('', 'deactivate');
   }
 };
 
@@ -55,8 +56,8 @@ const handleDice = (game, action) => {
     return;
   }
   if (action === 'deactivate') {
-    diceMsg.style.visibility = 'hidden';
     dice.onclick = null;
+    diceMsg.style.visibility = 'hidden';
     return;
   }
 };
@@ -79,7 +80,7 @@ const gameRound = (game) => {
 };
 
 const initGame = () => {
-  const board = new Board(snakes(), ladders());
+  const board = new Board(snakes(), ladders(), 30);
   const game = new Game(board);
   handleDice(game, 'activate');
 };

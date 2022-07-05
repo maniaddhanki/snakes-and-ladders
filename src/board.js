@@ -9,9 +9,11 @@ const numbersInRange = (start, end) => {
 class Board {
   #snakes;
   #ladders;
-  constructor(snakes, ladders) {
+  #target
+  constructor(snakes, ladders, target) {
     this.#snakes = snakes;
     this.#ladders = ladders;
+    this.#target = target;
   }
 
   #getPath(position, nextPosition) {
@@ -26,8 +28,17 @@ class Board {
     return path;
   }
 
+  #isValidMove(nextPosition) {
+    return nextPosition <= this.#target;
+  }
+
   nextMove(position, diceFace) {
+    let path = [];
+
     const nextPosition = position + diceFace;
-    return this.#getPath(position, nextPosition);
+    if (this.#isValidMove(nextPosition)) {
+      path = this.#getPath(position, nextPosition);
+    }
+    return path;
   }
 }
